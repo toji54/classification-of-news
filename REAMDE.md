@@ -1,1 +1,0 @@
-Развернутое прилоежние - https://classification-of-news-aigmqgfhdwh7h3gvcpfnx3.streamlit.app/
