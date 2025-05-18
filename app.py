@@ -2,38 +2,19 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 import pickle
-import zipfile
 import os
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 # Конфигурация
 CLASS_NAMES = ['World', 'Sports', 'Business', 'Sci/Tech']
-ZIP_PATH = 'model_glove_lstm.zip'  # ZIP-архив с моделью
-TOKENIZER_PATH = 'tokenizer.pkl'   # Отдельный файл токенизатора
-
-# Проверка и распаковка модели
-def prepare_model():
-    # Если папка модели уже существует - пропускаем распаковку
-    if os.path.exists('model_glove_savedmodel'):
-        return True
-        
-    if not os.path.exists(ZIP_PATH):
-        st.error(f"ZIP-архив с моделью '{ZIP_PATH}' не найден!")
-        return False
-        
-    try:
-        with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
-            zip_ref.extractall()
-        return True
-    except Exception as e:
-        st.error(f"Ошибка распаковки модели: {e}")
-        return False
+MODEL_PATH = 'model_glove_lstm.h5'  # Файл модели в формате H5
+TOKENIZER_PATH = 'tokenizer.pkl'    # Файл токенизатора
 
 # Загрузка модели
 @st.cache_resource
 def load_model():
     try:
-        return tf.keras.models.load_model('model_glove_savedmodel')
+        return tf.keras.models.load_model(MODEL_PATH)
     except Exception as e:
         st.error(f"Ошибка загрузки модели: {e}")
         return None
@@ -51,11 +32,7 @@ def load_tokenizer():
 # Интерфейс приложения
 def main():
     st.title("📰 News Classifier (GloVe+LSTM)")
-    st.write("Classifies English news text into 4 categories")
-    
-    # Подготовка модели
-    if not prepare_model():
-        st.stop()
+    st.write("Классифицирует новостной текст на английском языке по 4 категориям")
     
     # Загрузка компонентов
     model = load_model()
@@ -65,10 +42,10 @@ def main():
         st.stop()
     
     # Ввод текста
-    text = st.text_area("Enter news text (English only):", height=150,
+    text = st.text_area("Введите текст новости (только на английском языке):", height=150,
                        placeholder="Example: Tesla announced new battery technology...")
     
-    if st.button("Classify"):
+    if st.button("Классифицировать"):
         if not text.strip():
             st.warning("Please enter some text")
         else:
